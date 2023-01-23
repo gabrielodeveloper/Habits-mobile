@@ -1,14 +1,17 @@
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { Feather } from "@expo/vector-icons";
+
 import { BackButton } from "../components/BackButton";
 import { CheckBox } from "../components/CheckBox";
+import { api } from "../lib/axios";
 
-import { Feather } from "@expo/vector-icons";
 import colors from "tailwindcss/colors";
 
 const availableWeekDays = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
 export function New() {
+  const [title, setTitle] = useState('');
   const [weekDays, setWeekDays] = useState<number[]>([]);
 
   function handleToggleWeekDays(weekDayIndex: number) {
@@ -16,6 +19,24 @@ export function New() {
       setWeekDays(prevState => prevState.filter(weekDay => weekDay !== weekDayIndex));
     } else {
       setWeekDays(prevState => [...prevState, weekDayIndex]);
+    }
+  }
+
+  async function handleCreateNewHabit() {
+    try {
+      if (!title.trim() || weekDays.length === 0) {
+        Alert.alert('Novo Hábito', 'Informe o nome do hábito e escolha a periodicidade.');
+      }
+
+      await api.post('/habits', { title, weekDays });
+
+      setTitle('');
+      setWeekDays([]);
+
+      Alert.alert('Novo hábito', 'Hábito criado com sucesso!');
+    } catch (error) {
+      Alert.alert('Ops', 'Não foi possível criar o novo hábito!');
+      console.log(error);
     }
   }
 
@@ -36,6 +57,8 @@ export function New() {
         </Text>
 
         <TextInput
+          onChangeText={setTitle}
+          value={title}
           placeholder="Exercícios, dormir bem, etc..."
           placeholderTextColor={colors.zinc[400]}
           className="h-12 pl-4 rounded-lg mt-3 bg-zinc-900 text-white border-2 focus:border-zinc-800"
@@ -57,6 +80,7 @@ export function New() {
         }
 
         <TouchableOpacity
+          onPress={handleCreateNewHabit}
           className="w-full h-14 flex-row mt-6 bg-green-600 rounded-lg items-center justify-center"
           activeOpacity={0.7}
         >
