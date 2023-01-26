@@ -4,6 +4,7 @@ import { Feather } from "@expo/vector-icons";
 
 import { BackButton } from "../components/BackButton";
 import { CheckBox } from "../components/CheckBox";
+
 import { api } from "../lib/axios";
 
 import colors from "tailwindcss/colors";
@@ -25,7 +26,7 @@ export function New() {
   async function handleCreateNewHabit() {
     try {
       if (!title.trim() || weekDays.length === 0) {
-        Alert.alert('Novo Hábito', 'Informe o nome do hábito e escolha a periodicidade.');
+        return Alert.alert('Novo Hábito', 'Informe o nome do hábito e escolha a periodicidade.');
       }
 
       await api.post('/habits', { title, weekDays });
